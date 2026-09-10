@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora de rentabilidad — estudio de pilates</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F1EEE5;
+    --panel:#FAF8F3;
+    --ink:#20241E;
+    --ink-soft:#5B6156;
+    --line:#D9D0BE;
+    --teal:#1F453C;
+    --teal-soft:#3D6558;
+    --gold:#AD7E33;
+    --gold-soft:#E4CD9C;
+    --clay:#A6432E;
+    --clay-soft:#EFCFC5;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Public Sans', sans-serif;
+    line-height:1.5;
+  }
+  .wrap{
+    max-width:1080px;
+    margin:0 auto;
+    padding:36px 24px 64px;
+  }
+  header{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:16px;
+    border-bottom:1px solid var(--line);
+    padding-bottom:20px;
+    margin-bottom:28px;
+  }
+  h1{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:clamp(26px,3.4vw,36px);
+    margin:0;
+    letter-spacing:-0.01em;
+  }
+  .kicker{
+    font-size:14px;
+    color:var(--ink-soft);
+    margin:6px 0 0;
+    max-width:46ch;
+  }
+  .badge{
+    font-family:'Fraunces', serif;
+    font-size:13px;
+    color:var(--teal);
+    border:1px solid var(--teal);
+    padding:6px 12px;
+    white-space:nowrap;
+  }
+  .grid{
+    display:grid;
+    grid-template-columns:minmax(0,1.1fr) minmax(0,0.9fr);
+    gap:28px;
+  }
+  @media (max-width:820px){
+    .grid{grid-template-columns:1fr;}
+  }
+  section.panel{
+    background:var(--panel);
+    border:1px solid var(--line);
+    padding:26px 26px 28px;
+  }
+  h2{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:19px;
+    margin:0 0 4px;
+  }
+  .section-note{
+    font-size:13px;
+    color:var(--ink-soft);
+    margin:0 0 18px;
+  }
+  .block{margin-bottom:26px;}
+  .block:last-child{margin-bottom:0;}
+  .field-row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+    margin-bottom:12px;
+  }
+  .field{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+  .field label{
+    font-size:13px;
+    color:var(--ink-soft);
+  }
+  input[type="number"], input[type="text"]{
+    font-family:'Public Sans', sans-serif;
+    font-size:15px;
+    padding:9px 10px;
+    border:1px solid var(--line);
+    background:#fff;
+    color:var(--ink);
+    width:100%;
+  }
+  input[type="number"]:focus, input[type="text"]:focus{
+    outline:2px solid var(--teal-soft);
+    outline-offset:1px;
+  }
+  .cost-table{
+    width:100%;
+    border-collapse:collapse;
+    margin-bottom:10px;
+  }
+  .cost-table th{
+    text-align:left;
+    font-size:12px;
+    color:var(--ink-soft);
+    font-weight:500;
+    padding-bottom:6px;
+    border-bottom:1px solid var(--line);
+  }
+  .cost-table td{
+    padding:6px 0;
+    vertical-align:middle;
+  }
+  .cost-table td.amount-col{width:150px;}
+  .cost-table td.del-col{width:34px;text-align:right;}
+  .cost-table input[type="text"]{border:none;border-bottom:1px solid transparent;background:transparent;padding:7px 2px;}
+  .cost-table input[type="text"]:focus{border-bottom:1px solid var(--teal-soft);outline:none;}
+  .cost-table input[type="number"]{text-align:right;}
+  .del-btn{
+    background:none;
+    border:none;
+    color:var(--ink-soft);
+    cursor:pointer;
+    font-size:16px;
+    line-height:1;
+    padding:4px 6px;
+  }
+  .del-btn:hover{color:var(--clay);}
+  .add-row{
+    background:none;
+    border:1px dashed var(--line);
+    color:var(--teal);
+    font-size:13px;
+    padding:8px 12px;
+    cursor:pointer;
+    width:100%;
+    text-align:left;
+  }
+  .add-row:hover{border-color:var(--teal-soft);}
+  .cost-total{
+    display:flex;
+    justify-content:space-between;
+    margin-top:14px;
+    padding-top:12px;
+    border-top:1px solid var(--ink);
+    font-size:15px;
+  }
+  .cost-total strong{font-family:'Fraunces', serif;font-weight:500;font-size:18px;}
+
+  .slider-field{margin-bottom:16px;}
+  .slider-field .slider-top{
+    display:flex;
+    justify-content:space-between;
+    font-size:13px;
+    color:var(--ink-soft);
+    margin-bottom:6px;
+  }
+  .slider-top .val{color:var(--ink);font-weight:600;}
+  input[type="range"]{
+    width:100%;
+    accent-color:var(--teal);
+  }
+  .split-hint{
+    font-size:12px;
+    color:var(--ink-soft);
+    margin-top:4px;
+  }
+
+  .toggle-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:16px;
+    font-size:13px;
+    color:var(--ink-soft);
+  }
+  .switch{
+    position:relative;
+    width:38px;
+    height:21px;
+    flex:none;
+  }
+  .switch input{opacity:0;width:0;height:0;}
+  .slider-toggle{
+    position:absolute;inset:0;
+    background:var(--line);
+    cursor:pointer;
+    transition:.15s;
+  }
+  .slider-toggle:before{
+    content:"";
+    position:absolute;
+    height:15px;width:15px;
+    left:3px;top:3px;
+    background:#fff;
+    transition:.15s;
+  }
+  .switch input:checked + .slider-toggle{background:var(--teal);}
+  .switch input:checked + .slider-toggle:before{transform:translateX(17px);}
+
+  .price-fields{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+  }
+  .price-fields input[disabled]{
+    background:#F3F1EA;
+    color:var(--ink-soft);
+  }
+
+  /* results side */
+  .stat{
+    margin-bottom:22px;
+  }
+  .stat:last-child{margin-bottom:0;}
+  .stat-label{
+    font-size:13px;
+    color:var(--ink-soft);
+    margin-bottom:2px;
+  }
+  .stat-value{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:clamp(24px,3vw,30px);
+    color:var(--teal);
+  }
+  .stat-value.warn{color:var(--clay);}
+  .stat-sub{
+    font-size:13px;
+    color:var(--ink-soft);
+    margin-top:2px;
+  }
+  .divider{
+    border:none;
+    border-top:1px solid var(--line);
+    margin:22px 0;
+  }
+  .capacity-bar-wrap{margin-top:8px;}
+  .capacity-bar{
+    position:relative;
+    height:34px;
+    background:#fff;
+    border:1px solid var(--line);
+    margin-top:8px;
+  }
+  .capacity-fill{
+    position:absolute;
+    top:0;left:0;bottom:0;
+    background:var(--gold-soft);
+    transition:width .15s;
+  }
+  .capacity-fill.over-line{background:var(--clay-soft);}
+  .capacity-marker{
+    position:absolute;
+    top:-6px;bottom:-6px;
+    width:2px;
+    background:var(--teal);
+  }
+  .capacity-marker .marker-label{
+    position:absolute;
+    top:-20px;
+    transform:translateX(-50%);
+    font-size:11px;
+    color:var(--teal);
+    white-space:nowrap;
+  }
+  .capacity-scale{
+    display:flex;
+    justify-content:space-between;
+    font-size:11px;
+    color:var(--ink-soft);
+    margin-top:4px;
+  }
+  .mini-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13px;
+    margin-top:6px;
+  }
+  .mini-table td{padding:4px 0;}
+  .mini-table td:last-child{text-align:right;font-variant-numeric:tabular-nums;}
+  .mini-table tr:not(:last-child) td{border-bottom:1px solid var(--line);}
+
+  footer.note{
+    margin-top:28px;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    border-top:1px solid var(--line);
+    padding-top:16px;
+  }
+
+  /* pantalla de clave de acceso */
+  #lockScreen{
+    position:fixed;
+    inset:0;
+    background:var(--paper);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    z-index:10;
+  }
+  .lock-box{
+    background:var(--panel);
+    border:1px solid var(--line);
+    padding:32px 30px;
+    max-width:340px;
+    width:100%;
+  }
+  .lock-box h1{font-size:22px;margin-bottom:6px;}
+  .lock-box p{
+    font-size:13px;
+    color:var(--ink-soft);
+    margin:0 0 18px;
+  }
+  .lock-box input[type="password"]{
+    font-family:'Public Sans', sans-serif;
+    font-size:15px;
+    padding:10px 11px;
+    border:1px solid var(--line);
+    background:#fff;
+    width:100%;
+    margin-bottom:12px;
+  }
+  .lock-box button{
+    width:100%;
+    background:var(--teal);
+    color:#fff;
+    border:none;
+    padding:11px;
+    font-family:'Public Sans', sans-serif;
+    font-size:14px;
+    font-weight:600;
+    cursor:pointer;
+  }
+  .lock-box button:hover{background:var(--teal-soft);}
+  .lock-error{
+    color:var(--clay);
+    font-size:13px;
+    margin-top:10px;
+    display:none;
+  }
+  #appContent{display:none;}
+</style>
+</head>
+<body>
+
+<div id="lockScreen">
+  <div class="lock-box">
+    <h1>Calculadora de rentabilidad</h1>
+    <p>Ingresá la clave que te dio tu contador para acceder.</p>
+    <input type="password" id="lockInput" placeholder="Clave de acceso" autofocus>
+    <button type="button" id="lockButton">Entrar</button>
+    <p class="lock-error" id="lockError">Clave incorrecta. Probá de nuevo.</p>
+  </div>
+</div>
+
+<div id="appContent">
+<div class="wrap">
+
+  <header>
+    <div>
+      <h1>Calculadora de rentabilidad</h1>
+      <p class="kicker">Para estudios de pilates: definí cuánto cobrar la cuota o cuántos alumnos necesitás según tus costos fijos y tu capacidad.</p>
+    </div>
+    <span class="badge">Ficha de uso interno</span>
+  </header>
+
+  <div class="grid">
+
+    <!-- INPUTS -->
+    <section class="panel">
+      <div class="block">
+        <h2>Costos fijos mensuales</h2>
+        <p class="section-note">Alquiler, sueldos, servicios, mantenimiento de equipos, seguros, etc.</p>
+        <table class="cost-table" id="costTable">
+          <thead>
+            <tr><th>Concepto</th><th class="amount-col">Monto mensual</th><th class="del-col"></th></tr>
+          </thead>
+          <tbody id="costBody"></tbody>
+        </table>
+        <button class="add-row" id="addCostRow" type="button">+ Agregar concepto</button>
+        <div class="cost-total">
+          <span>Total costos fijos</span>
+          <strong id="costTotal">$0</strong>
+        </div>
+      </div>
+
+      <div class="block">
+        <h2>Capacidad del estudio</h2>
+        <p class="section-note">Cuántos lugares por semana puede ofrecer el estudio.</p>
+        <div class="field-row">
+          <div class="field">
+            <label for="camas">Cantidad de camas (reformers)</label>
+            <input type="number" id="camas" min="1" value="6">
+          </div>
+          <div class="field">
+            <label for="turnos">Turnos semanales</label>
+            <input type="number" id="turnos" min="1" value="48">
+          </div>
+        </div>
+      </div>
+
+      <div class="block">
+        <h2>Alumnos actuales</h2>
+        <p class="section-note">Cantidad real de alumnos anotados en cada plan.</p>
+        <div class="field-row">
+          <div class="field">
+            <label for="alumnos2">Alumnos en plan 2x/semana</label>
+            <input type="number" id="alumnos2" min="0" value="0">
+          </div>
+          <div class="field">
+            <label for="alumnos3">Alumnos en plan 3x/semana</label>
+            <input type="number" id="alumnos3" min="0" value="0">
+          </div>
+        </div>
+      </div>
+
+      <div class="block">
+        <h2>Cuota mensual</h2>
+        <p class="section-note">Lo que cobra el estudio por cada plan.</p>
+        <div class="price-fields">
+          <div class="field">
+            <label for="precio2">Cuota 2x/semana</label>
+            <input type="number" id="precio2" min="0" step="500" value="0">
+          </div>
+          <div class="field">
+            <label for="precio3">Cuota 3x/semana</label>
+            <input type="number" id="precio3" min="0" step="500" value="0">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RESULTS -->
+    <section class="panel">
+      <h2>Resultado</h2>
+      <p class="section-note">Se recalcula solo, a medida que cambiás los datos de la izquierda.</p>
+
+      <div class="stat">
+        <div class="stat-label">Cuota mensual (2x / 3x por semana)</div>
+        <div class="stat-value" id="cuotaSugerida">—</div>
+        <div class="stat-sub" id="cuotaSugeridaSub"></div>
+      </div>
+
+      <hr class="divider">
+
+      <div class="stat">
+        <div class="stat-label">Ocupación actual</div>
+        <div class="stat-value" id="ocupActual">—</div>
+        <div class="stat-sub" id="ocupActualSub"></div>
+      </div>
+
+      <div class="capacity-bar-wrap">
+        <div class="capacity-bar">
+          <div class="capacity-fill" id="capFill" style="width:0%"></div>
+          <div class="capacity-marker" id="breakevenMarker" style="left:0%">
+            <span class="marker-label">Punto de equilibrio</span>
+          </div>
+        </div>
+        <div class="capacity-scale">
+          <span>0 lugares</span>
+          <span id="capScaleMax">0 lugares</span>
+        </div>
+      </div>
+
+      <hr class="divider">
+
+      <div class="stat">
+        <div class="stat-label">Punto de equilibrio (alumnos para cubrir solo los costos fijos)</div>
+        <div class="stat-value" id="breakevenAlumnos">—</div>
+        <div class="stat-sub" id="breakevenSub"></div>
+      </div>
+
+      <hr class="divider">
+
+      <div class="stat">
+        <div class="stat-label">Situación con los alumnos actuales</div>
+        <table class="mini-table">
+          <tr><td>Alumnos actuales</td><td id="alumnosProy">—</td></tr>
+          <tr><td>Facturación mensual</td><td id="facturacionProy">—</td></tr>
+          <tr><td>Costos fijos</td><td id="costosProy">—</td></tr>
+          <tr><td>Resultado mensual</td><td id="resultadoProy">—</td></tr>
+          <tr><td>Margen resultante</td><td id="margenProy">—</td></tr>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <footer class="note">
+    Herramienta de estimación para uso interno del estudio. Los valores de costos fijos que aparecen al abrir la planilla son solo un ejemplo: reemplazalos por los propios antes de sacar conclusiones.
+  </footer>
+</div>
+</div>
+
+<script>
+  // ================================================================
+  // CLAVE DE ACCESO: cambiar este valor por una clave distinta
+  // para cada cliente antes de subir el archivo a su repositorio.
+  // ================================================================
+  const ACCESS_CODE = "pilates2026";
+
+  (function () {
+    const stored = sessionStorage.getItem('pilatesCalcUnlocked');
+    if (stored === ACCESS_CODE) {
+      document.getElementById('lockScreen').style.display = 'none';
+      document.getElementById('appContent').style.display = 'block';
+    }
+    document.getElementById('lockButton').addEventListener('click', tryUnlock);
+    document.getElementById('lockInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') tryUnlock();
+    });
+    function tryUnlock(){
+      const val = document.getElementById('lockInput').value;
+      if (val === ACCESS_CODE) {
+        sessionStorage.setItem('pilatesCalcUnlocked', ACCESS_CODE);
+        document.getElementById('lockScreen').style.display = 'none';
+        document.getElementById('appContent').style.display = 'block';
+      } else {
+        document.getElementById('lockError').style.display = 'block';
+      }
+    }
+  })();
+</script>
+
+<script>
+  const fmt = n => {
+    if (!isFinite(n)) return '—';
+    return '$' + Math.round(n).toLocaleString('es-AR');
+  };
+  const fmtInt = n => {
+    if (!isFinite(n)) return '—';
+    return Math.round(n).toLocaleString('es-AR');
+  };
+
+  // ---- costos fijos ----
+  const costBody = document.getElementById('costBody');
+  let costRowId = 0;
+
+  function addCostRow(nombre, monto){
+    costRowId++;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><input type="text" value="${nombre}" data-role="cost-name"></td>
+      <td class="amount-col"><input type="number" value="${monto}" min="0" step="1000" data-role="cost-amount"></td>
+      <td class="del-col"><button class="del-btn" type="button" title="Quitar">&times;</button></td>
+    `;
+    tr.querySelector('.del-btn').addEventListener('click', () => {
+      tr.remove();
+      recalc();
+    });
+    tr.querySelectorAll('input').forEach(inp => inp.addEventListener('input', recalc));
+    costBody.appendChild(tr);
+  }
+
+  document.getElementById('addCostRow').addEventListener('click', () => {
+    addCostRow('Nuevo concepto', 0);
+    recalc();
+  });
+
+  // valores de ejemplo iniciales
+  [
+    ['Alquiler del local', 450000],
+    ['Sueldos profesoras/instructores', 500000],
+    ['Sueldos administración', 300000],
+    ['Servicios (luz, agua, gas, internet)', 80000],
+    ['Mantenimiento y service de equipos', 30000],
+    ['Seguro', 25000],
+    ['Limpieza', 60000],
+    ['Software de gestión / reservas', 20000],
+    ['Honorarios contables e impositivos', 90000],
+    ['Marketing / redes', 40000],
+  ].forEach(([n,m]) => addCostRow(n,m));
+
+  // ---- inputs generales ----
+  const camasEl = document.getElementById('camas');
+  const turnosEl = document.getElementById('turnos');
+  const alumnos2El = document.getElementById('alumnos2');
+  const alumnos3El = document.getElementById('alumnos3');
+  const precio2El = document.getElementById('precio2');
+  const precio3El = document.getElementById('precio3');
+
+  [camasEl, turnosEl, alumnos2El, alumnos3El, precio2El, precio3El].forEach(el => {
+    el.addEventListener('input', recalc);
+  });
+
+  function getCostos(){
+    let total = 0;
+    costBody.querySelectorAll('tr').forEach(tr => {
+      const amount = parseFloat(tr.querySelector('[data-role="cost-amount"]').value) || 0;
+      total += amount;
+    });
+    return total;
+  }
+
+  function recalc(){
+    const costos = getCostos();
+    document.getElementById('costTotal').textContent = fmt(costos);
+
+    const camas = Math.max(0, parseFloat(camasEl.value) || 0);
+    const turnos = Math.max(0, parseFloat(turnosEl.value) || 0);
+    const slotsSemana = camas * turnos;
+
+    const alumnos2 = Math.max(0, parseFloat(alumnos2El.value) || 0);
+    const alumnos3 = Math.max(0, parseFloat(alumnos3El.value) || 0);
+    const alumnosTotal = alumnos2 + alumnos3;
+
+    // ocupación real, a partir de los alumnos cargados
+    const slotsUsados = alumnos2 * 2 + alumnos3 * 3;
+    const ocupPct = slotsSemana > 0 ? (slotsUsados / slotsSemana) * 100 : 0;
+    document.getElementById('ocupActual').textContent = slotsSemana > 0 ? ocupPct.toFixed(0) + '%' : '—';
+    document.getElementById('ocupActualSub').textContent = slotsSemana > 0
+      ? `${fmtInt(slotsUsados)} de ${fmtInt(slotsSemana)} lugares semanales ocupados (${fmtInt(alumnosTotal)} alumnos en total).`
+      : 'Cargá camas y turnos semanales para ver la ocupación.';
+    document.getElementById('capScaleMax').textContent = fmtInt(slotsSemana) + ' lugares';
+
+    // cuota mensual: siempre la que cargó el estudio
+    const precio2 = parseFloat(precio2El.value) || 0;
+    const precio3 = parseFloat(precio3El.value) || 0;
+
+    document.getElementById('cuotaSugerida').textContent = fmt(precio2) + '  /  ' + fmt(precio3);
+    document.getElementById('cuotaSugeridaSub').textContent = 'Cuota cargada por el estudio para cada plan.';
+
+    // punto de equilibrio, manteniendo la proporción real entre planes
+    const r2 = alumnosTotal > 0 ? alumnos2 / alumnosTotal : 0.5;
+    const r3 = 1 - r2;
+    const avgPrice = r2 * precio2 + r3 * precio3;
+    const breakevenAlumnos = avgPrice > 0 ? Math.ceil(costos / avgPrice) : 0;
+    const breakevenAlumnos2 = Math.round(breakevenAlumnos * r2);
+    const breakevenAlumnos3 = breakevenAlumnos - breakevenAlumnos2;
+    const breakevenSlots = breakevenAlumnos2 * 2 + breakevenAlumnos3 * 3;
+
+    document.getElementById('breakevenAlumnos').textContent = avgPrice > 0 ? fmtInt(breakevenAlumnos) + ' alumnos' : '—';
+    const diferencia = alumnosTotal - breakevenAlumnos;
+    document.getElementById('breakevenSub').textContent = avgPrice > 0
+      ? `≈ ${fmtInt(breakevenAlumnos2)} con plan 2x y ${fmtInt(breakevenAlumnos3)} con plan 3x. ` +
+        (diferencia >= 0
+          ? `Ya superás el punto de equilibrio por ${fmtInt(diferencia)} alumnos.`
+          : `Faltan ${fmtInt(-diferencia)} alumnos para cubrir los costos fijos.`)
+      : 'Ingresá una cuota mayor a $0 para calcularlo.';
+
+    // barra de capacidad: lugares ocupados vs. punto de equilibrio en lugares
+    const fillPct = slotsSemana > 0 ? Math.min(100, (slotsUsados / slotsSemana) * 100) : 0;
+    const breakevenPct = slotsSemana > 0 ? Math.min(100, (breakevenSlots / slotsSemana) * 100) : 0;
+    const fillEl = document.getElementById('capFill');
+    fillEl.style.width = fillPct + '%';
+    fillEl.classList.toggle('over-line', slotsUsados < breakevenSlots);
+    const markerEl = document.getElementById('breakevenMarker');
+    markerEl.style.left = breakevenPct + '%';
+
+    // situación actual
+    const facturacionProy = alumnos2 * precio2 + alumnos3 * precio3;
+    const resultadoProy = facturacionProy - costos;
+    const margenProy = facturacionProy > 0 ? (resultadoProy / facturacionProy) * 100 : 0;
+
+    document.getElementById('alumnosProy').textContent = `${fmtInt(alumnosTotal)} (${fmtInt(alumnos2)} en 2x, ${fmtInt(alumnos3)} en 3x)`;
+    document.getElementById('facturacionProy').textContent = fmt(facturacionProy);
+    document.getElementById('costosProy').textContent = fmt(costos);
+    const resEl = document.getElementById('resultadoProy');
+    resEl.textContent = fmt(resultadoProy);
+    resEl.style.color = resultadoProy < 0 ? 'var(--clay)' : 'inherit';
+    document.getElementById('margenProy').textContent = facturacionProy > 0 ? margenProy.toFixed(1) + '%' : '—';
+  }
+
+  recalc();
+</script>
+</body>
+</html>
